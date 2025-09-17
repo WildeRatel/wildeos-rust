@@ -15,3 +15,6 @@ panic = "abort"
 name = "wildeos-rust"
 test = false
 bench = false
+
+[unstable]
+build-std = ["core", "compiler_builtins"]
