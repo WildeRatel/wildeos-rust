@@ -23,7 +23,7 @@ pub enum Color {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
-struct ColorCode(u8);
+pub struct ColorCode(u8);
 
 impl ColorCode {
     fn new(foreground: Color, background: Color) -> ColorCode {
@@ -41,9 +41,10 @@ struct ScreenChar {
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
+use volatile::Volatile;
 #[repr(transparent)]
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 pub struct Writer {
@@ -65,10 +66,10 @@ impl Writer {
                 let col = self.column_position;
 
                 let color_code = self.color_code;
-                self.buffer.chars[row][col] = ScreenChar {
+                self.buffer.chars[row][col].write(ScreenChar {
                     ascii_character: byte,
-                    color_code: (color_code),
-                };
+                    color_code,
+                });
                 self.column_position += 1;
             }
         }
@@ -87,4 +88,24 @@ impl Writer {
 
     fn new_line() { /* TODO! */
     }
+}
+
+// Printing integers, floats, anything other than a char basically. Now we can use "write!"
+use core::fmt;
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
+// Welcome message on boot.
+pub fn vga_greeting() {
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::LightGray),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
+
+    writer.write_string("Hello World, and hello Rust Kernel!");
 }
