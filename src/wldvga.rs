@@ -98,6 +98,26 @@ impl Writer {
                 }
             }
         }
+        let blank_char = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for i in 0..BUFFER_WIDTH {
+            self.buffer.chars[BUFFER_HEIGHT - 1][i].write(blank_char);
+        }
+    }
+
+    pub fn vga_paint(&mut self) {
+        for i in 0..BUFFER_HEIGHT {
+            for j in 0..BUFFER_WIDTH {
+                let blank_char = ScreenChar {
+                    ascii_character: b' ',
+                    color_code: self.color_code,
+                };
+
+                self.buffer.chars[i][j].write(blank_char);
+            }
+        }
     }
 }
 
@@ -116,9 +136,11 @@ pub fn vga_greeting() {
     let mut writer = Writer {
         column_position: 0,
         row_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::LightGray),
+        color_code: ColorCode::new(Color::Yellow, Color::DarkGray),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
+
+    writer.vga_paint();
 
     // Writes to the buffer never "fail", hence the unwrap.
     for i in 0..BUFFER_HEIGHT + 1 {
