@@ -49,6 +49,7 @@ struct Buffer {
 
 pub struct Writer {
     column_position: usize,
+    row_position: usize,
     color_code: ColorCode,
     buffer: &'static mut Buffer,
 }
@@ -56,13 +57,13 @@ pub struct Writer {
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
-            b'\n' => Writer::new_line(),
+            b'\n' => self.new_line(),
             byte => {
                 if self.column_position >= BUFFER_WIDTH {
-                    Writer::new_line();
+                    self.new_line();
                 }
 
-                let row = BUFFER_HEIGHT - 1;
+                let row = self.row_position;
                 let col = self.column_position;
 
                 let color_code = self.color_code;
@@ -86,7 +87,17 @@ impl Writer {
         }
     }
 
-    fn new_line() { /* TODO! */
+    fn new_line(&mut self) {
+        self.column_position = 0;
+        self.row_position += 1;
+        if (self.row_position) > BUFFER_HEIGHT - 1 {
+            for i in 1..BUFFER_HEIGHT {
+                for j in 0..BUFFER_WIDTH {
+                    let temp = self.buffer.chars[i][j].read();
+                    self.buffer.chars[i - 1][j].write(temp);
+                }
+            }
+        }
     }
 }
 
@@ -104,10 +115,13 @@ pub fn vga_greeting() {
     use core::fmt::Write;
     let mut writer = Writer {
         column_position: 0,
+        row_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::LightGray),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
     // Writes to the buffer never "fail", hence the unwrap.
-    write!(writer, "Hello World! {}", 42).unwrap();
+    for i in 0..BUFFER_HEIGHT + 1 {
+        write!(writer, "Hello World! {}\n", i).unwrap();
+    }
 }
