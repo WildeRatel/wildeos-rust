@@ -101,11 +101,13 @@ impl fmt::Write for Writer {
 
 // Welcome message on boot.
 pub fn vga_greeting() {
+    use core::fmt::Write;
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::LightGray),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    writer.write_string("Hello World, and hello Rust Kernel!");
+    // Writes to the buffer never "fail", hence the unwrap.
+    write!(writer, "Hello World! {}", 42).unwrap();
 }
