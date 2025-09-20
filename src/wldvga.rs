@@ -54,6 +54,17 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
+use lazy_static::lazy_static;
+use spin::Mutex;
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
+        column_position: 0,
+        row_position: 0,
+        color_code: ColorCode::new(Color::White, Color::Blue),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
+}
+
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
@@ -107,6 +118,7 @@ impl Writer {
         }
     }
 
+    // Fills the screen with a color.
     pub fn vga_paint(&mut self) {
         for i in 0..BUFFER_HEIGHT {
             for j in 0..BUFFER_WIDTH {
@@ -127,23 +139,5 @@ impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
         Ok(())
-    }
-}
-
-// Welcome message on boot.
-pub fn vga_greeting() {
-    use core::fmt::Write;
-    let mut writer = Writer {
-        column_position: 0,
-        row_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::DarkGray),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
-
-    writer.vga_paint();
-
-    // Writes to the buffer never "fail", hence the unwrap.
-    for i in 0..BUFFER_HEIGHT + 1 {
-        write!(writer, "Hello World! {}\n", i).unwrap();
     }
 }
