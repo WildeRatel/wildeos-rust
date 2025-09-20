@@ -38,8 +38,8 @@ struct ScreenChar {
     color_code: ColorCode,
 }
 
-const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH: usize = 80;
+pub const BUFFER_HEIGHT: usize = 25;
+pub const BUFFER_WIDTH: usize = 80;
 
 use volatile::Volatile;
 #[repr(transparent)]
@@ -130,6 +130,16 @@ impl Writer {
                 self.buffer.chars[i][j].write(blank_char);
             }
         }
+    }
+
+    pub fn put_char(&mut self, character: u8, column: usize, row: usize) {
+        let prev_col = self.column_position.clone();
+        let prev_row = self.row_position.clone();
+        self.column_position = column;
+        self.row_position = row;
+        self.write_byte(character);
+        self.column_position = prev_col;
+        self.row_position = prev_row;
     }
 }
 
