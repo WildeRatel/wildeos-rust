@@ -23,6 +23,13 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
     }
 }
 
+#[test_case]
+fn trivial_assertion() {
+    print!("Trivial assertion: ");
+    assert_eq!(1, 1);
+    println!("[ok]")
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     wldvga::WRITER.lock().vga_paint();
@@ -36,6 +43,7 @@ pub extern "C" fn _start() -> ! {
     println!(
         "Testing put_char cursor return. This sentence aught to be on row 2 spanning all the way to 3 (Rows start at 0)."
     );
+    println!();
 
     #[cfg(test)]
     test_main();

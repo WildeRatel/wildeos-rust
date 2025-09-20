@@ -168,3 +168,13 @@ pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
 }
+
+#[test_case]
+fn check_buffer_range() {
+    print!("BUFFER_WIDTH: ");
+    assert_eq!(BUFFER_WIDTH, 80);
+    println!("[ok]");
+    print!("BUFFER_HEIGHT: ");
+    assert_eq!(BUFFER_HEIGHT, 25);
+    println!("[ok]");
+}
