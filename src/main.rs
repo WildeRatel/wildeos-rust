@@ -5,19 +5,24 @@ mod wldvga;
 
 use core::panic::PanicInfo;
 
+// General purpose panic handler.
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {} // TODO: Implement proper panic handling. 
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
+    loop {}
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     wldvga::WRITER.lock().vga_paint();
-    wldvga::WRITER.lock().write_string("Welcome to wildeos!\n");
+    println!(
+        "Welcome to wildeos!\nThe awnser to life, the universe and everything is: {}",
+        42
+    );
     wldvga::WRITER
         .lock()
         .put_char(b'+', wldvga::BUFFER_WIDTH / 2, wldvga::BUFFER_HEIGHT / 2);
-    wldvga::WRITER.lock().write_string("TESTING!");
+    println!("Testing put_char cursor return. This sentence aught to be on row 2.");
 
     loop {}
 }
