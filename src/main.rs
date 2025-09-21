@@ -33,7 +33,7 @@ fn panic(info: &PanicInfo) -> ! {
 // Test runner.
 #[cfg(test)]
 pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests.", tests.len() + 1);
+    serial_println!("Running {} tests.", tests.len());
 
     for test in tests {
         test.run();
@@ -66,21 +66,28 @@ fn trivial_assertion() {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     wldinterrupts::init_idt();
+
+    // Run tests.
+    #[cfg(test)]
+    test_main();
+
     wldvga::WRITER.lock().vga_paint();
+
     println!(
         "Welcome to wildeos!\nThe awnser to life, the universe and everything is: {}",
         42
     );
-    wldvga::WRITER
-        .lock()
-        .put_char(b'+', wldvga::BUFFER_WIDTH / 2, wldvga::BUFFER_HEIGHT / 2);
+
     println!(
         "Testing put_char cursor return. This sentence aught to be on row 2 spanning all the way to 3 (Rows start at 0)."
     );
-    println!();
 
-    #[cfg(test)]
-    test_main();
+    x86_64::instructions::interrupts::int3(); // Test if it goes nuts.
+    println!("If you are reading this line, it means the IDT is working :)");
+
+    unsafe {
+        *(0xdeadbeef as *mut u8) = 42;
+    }
 
     loop {}
 }
