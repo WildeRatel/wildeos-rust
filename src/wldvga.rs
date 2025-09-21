@@ -153,15 +153,13 @@ impl fmt::Write for Writer {
 }
 
 #[test_case]
-fn check_buffer_range() {
-    use crate::serial_print;
-    use crate::serial_println;
-    serial_print!("BUFFER_WIDTH:\t\t");
+fn check_buffer_width() {
     assert_eq!(BUFFER_WIDTH, 80);
-    serial_println!("[ok]");
-    serial_print!("BUFFER_HEIGHT:\t\t");
+}
+
+#[test_case]
+fn check_buffer_height() {
     assert_eq!(BUFFER_HEIGHT, 25);
-    serial_println!("[ok]");
 }
 
 #[macro_export]
