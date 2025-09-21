@@ -10,6 +10,7 @@ mod wldvga;
 use core::panic::PanicInfo;
 
 // General purpose panic handler.
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
@@ -17,9 +18,20 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
+// Panic test handler.
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}\n", info);
+    exit_qemu(QemuExitCode::Failed);
+    loop {}
+}
+
+// Test runner.
 #[cfg(test)]
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    serial_println!("Running {} tests.", tests.len());
+    serial_println!("Running {} tests.", tests.len() + 1);
 
     for test in tests {
         test();
@@ -31,10 +43,11 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 #[test_case]
 fn trivial_assertion() {
     serial_print!("Trivial assertion:\t");
-    assert_eq!(1, 1);
+    assert_eq!(1 + 1, 2);
     serial_println!("[ok]");
 }
 
+// Kernel main.
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     wldvga::WRITER.lock().vga_paint();
