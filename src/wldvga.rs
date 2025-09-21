@@ -152,6 +152,18 @@ impl fmt::Write for Writer {
     }
 }
 
+#[test_case]
+fn check_buffer_range() {
+    use crate::serial_print;
+    use crate::serial_println;
+    serial_print!("BUFFER_WIDTH:\t\t");
+    assert_eq!(BUFFER_WIDTH, 80);
+    serial_println!("[ok]");
+    serial_print!("BUFFER_HEIGHT:\t\t");
+    assert_eq!(BUFFER_HEIGHT, 25);
+    serial_println!("[ok]");
+}
+
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => ($crate::wldvga::_print(format_args!($($arg)*)));
@@ -167,14 +179,4 @@ macro_rules! println {
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
-}
-
-#[test_case]
-fn check_buffer_range() {
-    print!("BUFFER_WIDTH: ");
-    assert_eq!(BUFFER_WIDTH, 80);
-    println!("[ok]");
-    print!("BUFFER_HEIGHT: ");
-    assert_eq!(BUFFER_HEIGHT, 25);
-    println!("[ok]");
 }
