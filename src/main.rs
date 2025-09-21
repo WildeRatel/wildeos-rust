@@ -3,7 +3,9 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+#![feature(abi_x86_interrupt)]
 
+mod wldinterrupts;
 mod wldserial;
 mod wldvga;
 
@@ -63,6 +65,7 @@ fn trivial_assertion() {
 // Kernel main.
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
+    wldinterrupts::init_idt();
     wldvga::WRITER.lock().vga_paint();
     println!(
         "Welcome to wildeos!\nThe awnser to life, the universe and everything is: {}",
