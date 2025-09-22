@@ -5,6 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+mod wldgdt;
 mod wldinterrupts;
 mod wldserial;
 mod wldvga;
@@ -84,10 +85,6 @@ pub extern "C" fn _start() -> ! {
 
     x86_64::instructions::interrupts::int3(); // Test if it goes nuts.
     println!("If you are reading this line, it means the IDT is working :)");
-
-    unsafe {
-        *(0xdeadbeef as *mut u8) = 42;
-    }
 
     loop {}
 }
