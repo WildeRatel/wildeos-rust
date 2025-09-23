@@ -55,11 +55,6 @@ where
     }
 }
 
-#[test_case]
-fn trivial_assertion() {
-    assert_eq!(1 + 1, 2);
-}
-
 // Kernel main.
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
