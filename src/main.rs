@@ -30,13 +30,6 @@ pub extern "C" fn _start() -> ! {
         "Welcome to wildeos!\nThe awnser to life, the universe and everything is: {}",
         42
     );
-    wldvga::WRITER
-        .lock()
-        .put_char(b'+', wldvga::BUFFER_WIDTH / 2, wldvga::BUFFER_HEIGHT / 2);
-    println!(
-        "Testing put_char cursor return. This sentence aught to be on row 2 spanning all the way to 3 (Rows start at 0)."
-    );
-    println!();
 
     #[cfg(test)]
     test_main();

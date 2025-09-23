@@ -6,7 +6,6 @@
 
 use core::panic::PanicInfo;
 mod wldserial;
-mod wldvga;
 
 pub trait Testable {
     fn run(&self) -> ();
