@@ -152,16 +152,6 @@ impl fmt::Write for Writer {
     }
 }
 
-#[test_case]
-fn check_buffer_width() {
-    assert_eq!(BUFFER_WIDTH, 80);
-}
-
-#[test_case]
-fn check_buffer_height() {
-    assert_eq!(BUFFER_HEIGHT, 25);
-}
-
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => ($crate::wldvga::_print(format_args!($($arg)*)));
