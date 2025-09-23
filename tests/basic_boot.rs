@@ -18,6 +18,6 @@ fn test_runner(tests: &[&dyn Fn()]) {
 }
 
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) {
     loop {}
 }
